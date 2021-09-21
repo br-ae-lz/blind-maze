@@ -17,11 +17,6 @@ def makeGrid(size):
     return grid
 
 
-""" prints input grid to console """
-def printGrid(grid):
-    print(grid)
-
-
 """ runs the Aldous-Broder algorithm on the input grid to turn it into a uniform spanning tree maze """
 def aldousBroder(grid):
     # choose a random cell, travel to a random neighbour, carve a passage between them if unvisited, repeat until all cells visited
