@@ -4,39 +4,27 @@ import pygame as pg
 import numpy as np
 import imageio as io
 
-
-""" initialise an empty grid with the described cell size (min 2, max 99) """
+""" initialise an empty grid (numpy array of binary values) with the described cell size (min 2, max 99) """
 def makeGrid(size):
-    # builds grid's rows (row1 is individual cells, row2 is dividing lines)
-    row1 = []
-    row2 = []
-
-    for i in range (size*2 + 1):
-        if i % 2:
-            row1.append(' ')
-        else:
-            row1.append('|')
-        row2.append('-')
-
-    # builds grid from rows
-    grid = []
-    for i in range(size*2 + 1):
-        if i % 2:
-            grid.append(row1)
-        else:
-            grid.append(row2)
+    # creates an array of the desired size populated with zeros
+    grid = np.zeros((size*2 + 1, size*2 + 1), dtype=int)
     
+    # implants 1's in the array that correspond to cells
+    for i in range(size):
+        for j in range(size):
+            grid[i*2+1, j*2+1] = 1
+
     return grid
 
 
 """ prints input grid to console """
 def printGrid(grid):
-    for i in range(len(grid)):
-        print(grid[i])
+    print(grid)
 
 
 """ runs the Aldous-Broder algorithm on the input grid to turn it into a uniform spanning tree maze """
 def aldousBroder(grid):
+    # choose a random cell, travel to a random neighbour, carve a passage between them if unvisited, repeat until all cells visited
     pass
 
 
