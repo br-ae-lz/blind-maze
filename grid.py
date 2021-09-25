@@ -92,7 +92,7 @@ def aldousBroder(size):
                 dRestrict = True
                 moveOptions.remove('d')
 
-    # creates entrance and exit by removing a wall at the edge of either the rows or the columns
+    # creates entry and exit by removing a wall at the edge of either the rows or the columns
     # create entry (marked with -1)
     if random.randint(0, 1):
         row = random.choice([0, size*2])
@@ -103,7 +103,7 @@ def aldousBroder(size):
         row = random.randrange(1, len(grid), 2)
         grid[row, col] = -1
     # create exit (marked with -2)
-    # (wrapped in a loop with a conditional to ensure entrance and exit will not overlap)
+    # (wrapped in a loop with a conditional to ensure entry and exit will not overlap)
     while 1:
         if random.randint(0, 1):
             row = random.choice([0, size*2])
