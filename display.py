@@ -1,5 +1,10 @@
 # display/ui functions go here!
 
+import OpenGL
+import OpenGL.GL
+import OpenGL.GLUT
+import OpenGL.GLU
+
 ''' keeping pictureGrid() here for future reference while attempting to get basic visuals working '''
 
 # """ saves input grid as a .jpg image in the folder "temp" in project root """
@@ -44,3 +49,4 @@
 #         pg.display.flip()
     
 #     pg.image.save(screen, "temp\grid_pic.jpg")
+
