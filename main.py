@@ -1,6 +1,6 @@
 import grid
 
-playerGrid = grid.aldousBroder(14)
+playerGrid = grid.aldousBroder(12)
 
 
 ''' debug code for viewing algorithm result '''
@@ -31,7 +31,7 @@ while not done:
             done = True
     for i in range(len(playerGrid)):
         for j in range(len(playerGrid)):
-            if playerGrid[i, j] == 1 or playerGrid [i,j] == 2:
+            if playerGrid[i, j] != 0:
                 pass
             else:
                 pg.draw.line(screen, BLACK, [50*j, 24 + i*50], [50*(j+1), 24 + i*50], 50)
