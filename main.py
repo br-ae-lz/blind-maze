@@ -1,39 +1,47 @@
 import grid
+import input
+from OpenGL.GL import *
+import glfw
+import numpy as np
 
-playerGrid = grid.aldousBroder(12)
+
+''' startup routine '''
+# playerGrid = grid.aldousBroder(2)
+
+# checks user's version (only creates their window if sufficient)
+glfw.init()
+glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+
+# creates window, points to it as the current context
+window = glfw.create_window(800, 800, "Blind Maze", None, None)
+glfw.make_context_current(window)
+# if window failed to be created, properly terminate
+if (not window):
+    print("Failed to create GLFW window")
+    glfw.terminate()
+    exit()
+
+# defines window area to be used in px
+glViewport(0, 0, 800, 800)
+# binds callback for if window is resized
+glfw.set_framebuffer_size_callback(window, input.framebufSizeCallback)
+
+vbo = 0
+glGenBuffers(1, vbo)
 
 
-''' debug code for viewing algorithm result '''
-import pygame as pg
+''' main loop '''
+while(not glfw.window_should_close(window)):
+    input.keyInput(window)
 
-pg.init()
+    # rendering stuff; clear colour buffer
+    glClear(GL_COLOR_BUFFER_BIT)
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-BLUE =  (  0,   0, 255)
-GREEN = (  0, 255,   0)
-RED =   (255,   0,   0)
+    # swap colour buffers to update display and address any events
+    glfw.swap_buffers(window)
+    glfw.poll_events()
 
-# initializes the screen with a grid-based resolution 
-screen = pg.display.set_mode(size=(len(playerGrid)*50, len(playerGrid)*50))
 
-done = False
-clock = pg.time.Clock()
-# Clear the screen and set the screen background
-screen.fill(WHITE)
-while not done:
-    # limits the loop to running 10 times per second, saving CPU
-    clock.tick(10)
-    
-    # lets the user close the window if they request to, ends loop
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            done = True
-    for i in range(len(playerGrid)):
-        for j in range(len(playerGrid)):
-            if playerGrid[i, j] != 0:
-                pass
-            else:
-                pg.draw.line(screen, BLACK, [50*j, 24 + i*50], [50*(j+1), 24 + i*50], 50)
-            
-    pg.display.flip()
+''' exit routine '''
+glfw.terminate()

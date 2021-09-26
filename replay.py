@@ -1,12 +1,10 @@
-# display/ui functions go here!
+# replay stuff goes here!
 
-import OpenGL
-import OpenGL.GL
-import OpenGL.GLUT
-import OpenGL.GLU
+from OpenGL.GL import *
+import glfw
+import numpy as np
 
-''' keeping pictureGrid() here for future reference while attempting to get basic visuals working '''
-
+''' keeping pictureGrid() here for future reference '''
 # """ saves input grid as a .jpg image in the folder "temp" in project root """
 # # currently half-finished because saving an image of the grid with the window hidden is not possible for pyGame
 # def pictureGrid(grid):
@@ -49,4 +47,3 @@ import OpenGL.GLU
 #         pg.display.flip()
     
 #     pg.image.save(screen, "temp\grid_pic.jpg")
-
