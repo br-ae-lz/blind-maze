@@ -2,7 +2,6 @@
 from OpenGL.GL import *
 import glfw
 
-
 ''' callback function for when window is resized '''
 def framebufSizeCallback(window, width, height):
     glViewport(0, 0, width, height)
