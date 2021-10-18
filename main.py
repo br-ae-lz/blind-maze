@@ -109,7 +109,7 @@ exitVertices = np.array( [-0.9,  1.0, 0.0,  # 0-2 - top exit
                            0.9,  1.0, 0.0,  
                            0.0,  0.4, 0.0,   
                           
-                           1.0,  0.9, 0.0,   # 3-5 - right exit
+                           1.0,  0.9, 0.0,  # 3-5 - right exit
                            1.0, -0.9, 0.0,  
                            0.4,  0.0, 0.0,
                           
@@ -204,41 +204,110 @@ glDeleteShader(exitFragmentShader)
 
 
 ''' game setup '''
-playerGrid = grid.aldousBroder(2)
+# generates grid
+playerGrid = grid.aldousBroder(4)
 
+# determines player starting position, which is one cell inwards from the entry
+playerpos = np.where(playerGrid == -1)
+playerRow = playerpos[0][0]
+playerCol = playerpos[1][0]
 
-''' main loop '''
-while(not glfw.window_should_close(window)):
-    input.keyInput(window)
+if (playerRow == 0):
+    playerRow += 1
+elif (playerRow == (len(playerGrid) - 1)):
+    playerRow -= 1
+elif (playerCol == 0):
+    playerCol += 1
+elif (playerCol == (len(playerGrid) - 1)):
+    playerCol -= 1
 
+# draws the player's surroundings in their current position to the screen
+# (thus handling drawing on a need-be basis to reduce gpu usage)
+def renderPosition(row, col, grid):
     # clear screen to black
     glClear(GL_COLOR_BUFFER_BIT)
 
-    # sets conditions for drawing walls
+    # draw corners
     glUseProgram(wallShader)
     glBindVertexArray(wallVAO)
-    # draws an L (and extraneous corner), befitting of our current state
+
     cornerEBO.bind()
     glDrawElements(GL_TRIANGLES, 3*8, GL_UNSIGNED_INT, None)
-    bottomWallEBO.bind()
-    glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, None)
-    leftWallEBO.bind()
-    glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, None)
 
-    # sets conditions for drawing exits
+    # draw surrounding walls
+    if (grid[row-1][col] == 0):
+        topWallEBO.bind()
+        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, None)
+    if (grid[row][col+1] == 0):
+        rightWallEBO.bind()
+        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, None)
+    if (grid[row+1][col] == 0):
+        bottomWallEBO.bind()
+        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, None)
+    if (grid[row][col-1] == 0):
+        leftWallEBO.bind()
+        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, None)
+    
+    # draw surrounding exits
     glUseProgram(exitShader)
     glBindVertexArray(exitVAO)
-    # draws an exit to the right
-    rightExitEBO.bind()
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, None)
 
-    # swap colour buffers to update display & address any events
+    if (grid[row-1][col] < 0):
+        topExitEBO.bind()
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, None)
+    if (grid[row][col+1] < 0):
+        rightExitEBO.bind()
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, None)
+    if (grid[row+1][col] < 0):
+        bottomExitEBO.bind()
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, None)
+    if (grid[row][col-1] < 0):
+        leftExitEBO.bind()
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, None)
+
+    # swap colour buffers to update display
     glfw.swap_buffers(window)
-    glfw.poll_events()
 
-# draws the player's surroundings in their current position to the screen -- it needs a *little* work...
-def renderPosition():
-    pass
+# draws the player's initial surroundings
+renderPosition(playerRow, playerCol, playerGrid)
+
+''' main loop '''
+lastInputStatus = 0
+# processes player input and essentially waits for them to win
+while(not glfw.window_should_close(window)):
+    # waits for the player to do something
+    glfw.wait_events()
+
+    # record whether input is for movement (if so, direction is included)
+    inputStatus = input.keyInput(window)
+
+    # processes movement input only if previously pressed movement key has been released
+    if (lastInputStatus == 0):
+        if inputStatus == 1:    # up movement
+            if (playerGrid[playerRow-1][playerCol] > 0):
+                playerRow -= 1
+            elif (playerGrid[playerRow-1][playerCol] == -2):
+                break
+        elif inputStatus == 2:  # right movement
+            if (playerGrid[playerRow][playerCol+1] > 0):
+                playerCol += 1
+            elif (playerGrid[playerRow][playerCol+1] == -2):
+                break
+        elif inputStatus == 3:  # down movement
+            if (playerGrid[playerRow+1][playerCol] > 0):
+                playerRow += 1
+            elif (playerGrid[playerRow+1][playerCol] == -2):
+                break
+        elif inputStatus == 4:  # left movement
+            if (playerGrid[playerRow][playerCol-1] > 0):
+                playerCol -= 1
+            elif (playerGrid[playerRow][playerCol-1] == -2):
+                break
+
+    # update the screen to show movement and satisfy events like the window resize callback
+    renderPosition(playerRow, playerCol, playerGrid)
+
+    lastInputStatus = inputStatus
 
 
 ''' exit routine '''

@@ -4,7 +4,7 @@ from OpenGL.GL import *
 import glfw
 import numpy as np
 
-''' keeping pictureGrid() here for future reference '''
+''' keeping the deprecated pictureGrid() here for future reference while constructing OpenGL equivalent '''
 # """ saves input grid as a .jpg image in the folder "temp" in project root """
 # # currently half-finished because saving an image of the grid with the window hidden is not possible for pyGame
 # def pictureGrid(grid):
