@@ -1,5 +1,5 @@
 /* 
-    defines functions for processing user input
+    Defines functions for processing user input
 */
 
 #include <glad/glad.h>

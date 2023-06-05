@@ -1,5 +1,5 @@
 /* 
-    declares functions for processing user input
+    Declares functions for processing user input
 */
 
 #include <glfw/glfw3.h>

@@ -1,5 +1,5 @@
 /*
-    declares functions for maze generation
+    Declares functions for maze generation
 */
 
 #include <vector>
@@ -11,4 +11,4 @@
  *  @param size dictates size of the generated maze (min 2, max 99)
  *  @returns size*size uniform spanning tree maze
  *********************************************************************************/
-extern std::vector<std::vector<int>> aldousBroder(int size);
+extern std::vector<std::vector<int>> aldousBroder(const int size);

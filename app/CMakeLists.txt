@@ -10,6 +10,6 @@ target_sources(blind-maze
 
 target_include_directories(blind-maze PRIVATE include)
 
-target_link_options(blind-maze PRIVATE -mwindows)
+#target_link_options(blind-maze PRIVATE -mwindows)
 
 set_property(TARGET blind-maze PROPERTY CXX_STANDARD 20)
