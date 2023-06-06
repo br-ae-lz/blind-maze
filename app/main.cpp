@@ -11,17 +11,16 @@
 
 
 /*********************************************************************************
- *  @brief main game loop
+ *  @brief Main game loop
  *********************************************************************************/
 int main() 
 {
-    // check user's OpenGL version (and create window only if sufficient)
+    // Check user's OpenGL version (and create window only if sufficient)
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // ensure window is created successfully then point to it as the current context
     GLFWwindow* window = glfwCreateWindow(800, 800, "Blind Maze", NULL, NULL);
     if (!window)
     {
@@ -31,49 +30,47 @@ int main()
     }
     glfwMakeContextCurrent(window);
 
-    // ensure GLAD is initialized correctly
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
     {
         std::cout << "ERROR: Failed to initialize GLAD" << std::endl;
         return -1;
     }   
 
-    // define window area to be used in px
     glViewport(0, 0, 800, 800);
-    // binds callback for if window is resized
     glfwSetFramebufferSizeCallback(window, framebufSizeCallback);
 
-    // initialize vertex data corresponding to all vertices necessary for drawing walls and openings
-    // (vertices are laid out as "wall corners"; four corners are drawn by default, so we draw walls by connecting them)
+    // Initialize vertex data for drawing walls and openings
+    // (These vertices define a square in each corner of the screen -- walls are made by connecting them)
     float wallVertices[] = {
-        -0.8,  0.8, 0.0,  // 0 - top left corner; top left
-        -0.6,  0.8, 0.0,  // 1 - top left corner; top right
-        -0.8,  0.6, 0.0,  // 2 - top left corner; bottom left
-        -0.6,  0.6, 0.0,  // 3 - top left corner; bottom right
+        -0.8,  0.8, 0.0,  // 0 - top left (of top left corner)
+        -0.6,  0.8, 0.0,  // 1 - top right
+        -0.8,  0.6, 0.0,  // 2 - bottom left
+        -0.6,  0.6, 0.0,  // 3 - bottom right
   
-         0.6,  0.8, 0.0,  // 4 - top right corner; top left
-         0.8,  0.8, 0.0,  // 5 - top right corner; top right
-         0.6,  0.6, 0.0,  // 6 - top right corner; bottom left
-         0.8,  0.6, 0.0,  // 7 - top right corner; bottom right
+         0.6,  0.8, 0.0,  // 4 - top left (of top right corner)
+         0.8,  0.8, 0.0,  // 5 - top right
+         0.6,  0.6, 0.0,  // 6 - bottom left
+         0.8,  0.6, 0.0,  // 7 - bottom right
    
-        -0.8, -0.6, 0.0,  // 8 - bottom left corner; top left
-        -0.6, -0.6, 0.0,  // 9 - bottom left corner; top right
-        -0.8, -0.8, 0.0,  // 10 - bottom left corner; bottom left
-        -0.6, -0.8, 0.0,  // 11 - bottom left corner; bottom right
+        -0.8, -0.6, 0.0,  // 8 - top left (of bottom left corner)
+        -0.6, -0.6, 0.0,  // 9 - top right
+        -0.8, -0.8, 0.0,  // 10 - bottom left
+        -0.6, -0.8, 0.0,  // 11 - bottom right
                            
-         0.6, -0.6, 0.0,  // 12 - bottom right corner; top left
-         0.8, -0.6, 0.0,  // 13 - bottom right corner; top right
-         0.6, -0.8, 0.0,  // 14 - bottom right corner; bottom left
-         0.8, -0.8, 0.0   // 15 - bottom right corner; bottom right
+         0.6, -0.6, 0.0,  // 12 - top left (of bottom right corner)
+         0.8, -0.6, 0.0,  // 13 - top right
+         0.6, -0.8, 0.0,  // 14 - bottom left
+         0.8, -0.8, 0.0   // 15 - bottom right
     };
 
-    // create and fill a VBO with wall vertex data 
+    // Populate new VBO with wall vertex data 
     unsigned int wallVBO;
     glGenBuffers(1, &wallVBO);
     glBindBuffer(GL_ARRAY_BUFFER, wallVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(wallVertices), wallVertices, GL_STATIC_DRAW);
 
-    // define triangle indices for drawing walls from vertex data and bind them to corresponding EBO
+    // Define the indices of two triangles that will draw each corner using wallVertices data and
+    // bind them to corresponding EBO
     uint32_t cornerIndices[] = {
         0, 1, 2,     // top left corner
         2, 3, 1,
