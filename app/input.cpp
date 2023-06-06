@@ -6,8 +6,8 @@
 #include <glfw/glfw3.h>
 
 /*********************************************************************************
- *  @brief resizes window to match framebuffer whenever the latter is resized
- *         (as a callback function, is called automatically with given parameters)
+ *  @brief Resizes window to match framebuffer whenever the latter is resized.
+ *         (Parameters are passed automatically when called as a callback.)
  *
  *  @param window   window whose framebuffer was resized
  *  @param width    new width of framebuffer
@@ -19,26 +19,22 @@ void framebufSizeCallback(GLFWwindow* window, int width, int height)
 }
 
 /*********************************************************************************
- *  @brief uses GLFW to process keyboard input (where wasd and arrow keys control 
- *         player movement, escape closes window)
+ *  @brief Uses GLFW to process keyboard input.
  *
  *  @param window GLFW window whose input is to be processed
  *  @returns int corresponding to movement direction:
- *                  0 - none
- *                  1 - up
- *                  2 - right
- *                  3 - down
- *                  4 - left
+ *          0 - none    1 - up      4 - left
+ *          2 - right   3 - down 
  *********************************************************************************/
 int keyInput(GLFWwindow* window) 
 {
-    // if escape is pressed, close window
+    // Close window if escape key is pressed
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
     {
         glfwSetWindowShouldClose(window, true);
     }
 
-    // if movement direction is pressed, return its corresponding value
+    // Return movement direction if corresponding key is pressed
     if ( (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) ) 
         return 1;
     if ( (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) ) 
