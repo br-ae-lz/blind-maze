@@ -6,12 +6,12 @@
 #include <glfw/glfw3.h>
 
 /*********************************************************************************
- *  @brief Resizes window to match framebuffer whenever the latter is resized.
+ * @brief Resizes window to match framebuffer whenever the latter is resized.
  *         (Parameters are passed automatically when called as a callback.)
  *
- *  @param window   window whose framebuffer was resized
- *  @param width    new width of framebuffer
- *  @param height   new height of framebuffer
+ * @param window   GLFW window whose framebuffer was resized
+ * @param width    new width of framebuffer
+ * @param height   new height of framebuffer
  *********************************************************************************/
 void framebufSizeCallback(GLFWwindow* window, int width, int height) 
 {
@@ -19,10 +19,10 @@ void framebufSizeCallback(GLFWwindow* window, int width, int height)
 }
 
 /*********************************************************************************
- *  @brief Uses GLFW to process keyboard input.
+ * @brief Uses GLFW to process keyboard input.
  *
- *  @param window GLFW window whose input is to be processed
- *  @returns int corresponding to movement direction:
+ * @param window GLFW window whose input is to be processed
+ * @returns int corresponding to movement direction:
  *          0 - none    1 - up      4 - left
  *          2 - right   3 - down 
  *********************************************************************************/

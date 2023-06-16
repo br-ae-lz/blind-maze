@@ -7,7 +7,7 @@
 /*********************************************************************************
  *  @brief resizes window to match framebuffer whenever the latter is resized
  *
- *  @param window   window whose framebuffer was resized
+ *  @param window   GLFW window whose framebuffer was resized
  *  @param width    new width of framebuffer
  *  @param height   new height of framebuffer
  *********************************************************************************/

@@ -8,11 +8,9 @@
 
 #include <grid.h>
 #include <input.h>
+#include <render.h>
 
 
-/*********************************************************************************
- *  @brief Main game loop
- *********************************************************************************/
 int main() 
 {
     // Check user's OpenGL version (and create window only if sufficient)
@@ -38,64 +36,58 @@ int main()
 
     glViewport(0, 0, 800, 800);
     glfwSetFramebufferSizeCallback(window, framebufSizeCallback);
+    initRenderData();
 
-    // Initialize vertex data for drawing walls and openings
-    // (These vertices define a square in each corner of the screen -- walls are made by connecting them)
-    float wallVertices[] = {
-        -0.8,  0.8, 0.0,  // 0 - top left (of top left corner)
-        -0.6,  0.8, 0.0,  // 1 - top right
-        -0.8,  0.6, 0.0,  // 2 - bottom left
-        -0.6,  0.6, 0.0,  // 3 - bottom right
-  
-         0.6,  0.8, 0.0,  // 4 - top left (of top right corner)
-         0.8,  0.8, 0.0,  // 5 - top right
-         0.6,  0.6, 0.0,  // 6 - bottom left
-         0.8,  0.6, 0.0,  // 7 - bottom right
-   
-        -0.8, -0.6, 0.0,  // 8 - top left (of bottom left corner)
-        -0.6, -0.6, 0.0,  // 9 - top right
-        -0.8, -0.8, 0.0,  // 10 - bottom left
-        -0.6, -0.8, 0.0,  // 11 - bottom right
-                           
-         0.6, -0.6, 0.0,  // 12 - top left (of bottom right corner)
-         0.8, -0.6, 0.0,  // 13 - top right
-         0.6, -0.8, 0.0,  // 14 - bottom left
-         0.8, -0.8, 0.0   // 15 - bottom right
-    };
+    // Prepare to render initial player position 
+    std::vector<std::vector<int>> playerGrid = createMaze(3);
+    int pos[2];
+    findPlayerPos(playerGrid, *pos);
 
-    // Populate new VBO with wall vertex data 
-    unsigned int wallVBO;
-    glGenBuffers(1, &wallVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, wallVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(wallVertices), wallVertices, GL_STATIC_DRAW);
+    int lastInputStatus = 0;
+    bool exitReached = false;
 
-    // Define the indices of two triangles that will draw each corner using wallVertices data and
-    // bind them to corresponding EBO
-    uint32_t cornerIndices[] = {
-        0, 1, 2,     // top left corner
-        2, 3, 1,
-        4, 5, 6,     // top right corner
-        6, 7, 5,
-        8, 9, 10,    // bottom left corner
-        10, 11, 9,
-        12, 13, 14,  // bottom right corner
-        14, 15, 13
-    };
+    // Main loop begins
+    while (!glfwWindowShouldClose(window) || exitReached)
+    { 
+        renderPosition(playerGrid, *pos, window);
 
-    unsigned int cornerEBO;
-    glGenBuffers(1, &cornerEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, cornerEBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cornerIndices), cornerIndices, GL_ELEMENT_ARRAY_BUFFER);
+        // Record key pressed upon player input
+        glfwWaitEvents();
+        int inputStatus = keyInput(window);
 
+        // Process movement input once pressed key has been released
+        if (lastInputStatus == 0) {
+            switch(inputStatus) {
+                case 1:     // Up 
+                    if (playerGrid[pos[0]-1][pos[1]] > 0)
+                        pos[0]--;
+                    break;
 
-    aldousBroder(3);
+                case 2:     // Right  
+                    if (playerGrid[pos[0]][pos[1]+1] > 0)
+                        pos[1]++;
+                    break;
 
-    while (!glfwWindowShouldClose(window))
-    {
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+                case 3:     // Down 
+                    if (playerGrid[pos[0]+1][pos[1]] > 0)
+                        pos[0]++;
+                    break;
+                    
+                case 4:     // Left 
+                    if (playerGrid[pos[0]][pos[1]-1] > 0)
+                        pos[1]--;
+                    break;
+            }
+        }
+
+        // Exit loop if player has escaped
+        if (playerGrid[pos[0]][pos[1]] == 2) { 
+            exitReached = true;
+        }
+
+        lastInputStatus = inputStatus;
     }
-    glfwTerminate();
 
+    glfwTerminate();
     return 0;
 }

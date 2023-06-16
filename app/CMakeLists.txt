@@ -5,6 +5,7 @@ target_sources(blind-maze
 		main.cpp
 		grid.cpp
 		input.cpp
+		render.cpp
 		replay.cpp
 )
 
