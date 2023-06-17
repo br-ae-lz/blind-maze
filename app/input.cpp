@@ -30,9 +30,7 @@ int keyInput(GLFWwindow* window)
 {
     // Close window if escape key is pressed
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) 
-    {
         glfwSetWindowShouldClose(window, true);
-    }
 
     // Return movement direction if corresponding key is pressed
     if ( (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) ) 

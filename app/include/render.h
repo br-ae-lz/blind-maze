@@ -15,4 +15,4 @@ void initRenderData();
  * @param pos two element array of current row and column coordinates, respectively
  * @param window GLFW window being treated as the main context
  *********************************************************************************/
-void renderPosition(std::vector<std::vector<int>> grid, int &pos, GLFWwindow* window);
+void renderPosition(std::vector<std::vector<int>> grid, int *pos, GLFWwindow* window);

@@ -2,11 +2,13 @@
     Contains data and functions used to render graphics
 */
 
+#include <iostream>
 #include <vector>
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
 
+unsigned int wallVAO;
 unsigned int wallVBO;
 unsigned int exitVAO;
 unsigned int exitVBO;
@@ -21,11 +23,16 @@ unsigned int rightExitEBO;
 unsigned int bottomExitEBO;
 unsigned int leftExitEBO;
 
+unsigned int wallShader;
+unsigned int exitShader;
+
 /*********************************************************************************
- * @brief Define and store all vertex data necessary for future rendering
- *        into appropriate buffers.
+ * @brief Define and store all vertex data necessary for future rendering.
  *********************************************************************************/
-void initRenderData() {
+void initRenderData() { 
+    glGenVertexArrays(1, &wallVAO);
+    glBindVertexArray(wallVAO);
+
     // Initialize vertex data for drawing walls and openings
     // (These vertices define a square in each corner of the screen -- walls are made by connecting them)
     float wallVertices[] = {
@@ -109,7 +116,6 @@ void initRenderData() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
-    // ???
     glGenVertexArrays(1, &exitVAO);
     glBindVertexArray(exitVAO);
 
@@ -138,24 +144,114 @@ void initRenderData() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(exitVertices), exitVertices, GL_STATIC_DRAW);
 
     // Define indices of triangles that will denote exits and bind them to EBOs
+    uint32_t topExitIndices[] = {0, 1, 2};
+    uint32_t rightExitIndices[] = {3, 4, 5};
+    uint32_t bottomExitIndices[] = {6, 7, 8};
+    uint32_t leftExitIndices[] = {9, 10, 11};
+
     glGenBuffers(1, &topExitEBO);
     glBindBuffer(GL_ARRAY_BUFFER, topExitEBO);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), (int []){0, 1, 2}, GL_ELEMENT_ARRAY_BUFFER);
+    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), topExitIndices, GL_ELEMENT_ARRAY_BUFFER);
  
     glGenBuffers(1, &rightExitEBO);
     glBindBuffer(GL_ARRAY_BUFFER, rightExitEBO);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), (int []){3, 4, 5}, GL_ELEMENT_ARRAY_BUFFER);
+    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), rightExitIndices, GL_ELEMENT_ARRAY_BUFFER);
 
     glGenBuffers(1, &bottomExitEBO);
     glBindBuffer(GL_ARRAY_BUFFER, bottomExitEBO);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), (int []){6, 7, 8}, GL_ELEMENT_ARRAY_BUFFER);
+    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), bottomExitIndices, GL_ELEMENT_ARRAY_BUFFER);
     
     glGenBuffers(1, &leftExitEBO);
     glBindBuffer(GL_ARRAY_BUFFER, leftExitEBO);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), (int []){9, 10, 11}, GL_ELEMENT_ARRAY_BUFFER);
+    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), leftExitIndices, GL_ELEMENT_ARRAY_BUFFER);
 
     // Specify how exit vertex data is read from buffers
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
 
+    // Clean up state before drawing
+    glBindVertexArray(0);
+    glBindBuffer(1, 0);
+
+    // Compile vertex shader and wall and exit fragment shaders
+    const char *vertexShaderSource = "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "}\0";
+
+    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+    const char *wallFragmentShaderSource = "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main()\n"
+        "{\n"
+        "   FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
+        "}\n";
+
+    unsigned int wallFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(wallFragmentShader, 1, &wallFragmentShaderSource, NULL);
+    glCompileShader(wallFragmentShader);
+ 
+    const char *exitFragmentShaderSource = "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main()\n"
+        "{\n"
+        "   FragColor = vec4(1.0f, 1.0f, 0.75f, 1.0f);\n"
+        "}\n";
+    
+    unsigned int exitFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(exitFragmentShader, 1, &exitFragmentShaderSource, NULL);
+    glCompileShader(exitFragmentShader);
+    
+    // Report shader compilation errors (if any)
+    int status;
+    char logString[512];
+
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
+    if (!status) {
+        glGetShaderInfoLog(vertexShader, 512, NULL, logString);
+        std::cout << "ERROR: Vertex shader compilation failed -- " << logString << std::endl;
+    }
+    glGetShaderiv(wallFragmentShader, GL_COMPILE_STATUS, &status);
+    if (!status) {
+        glGetShaderInfoLog(wallFragmentShader, 512, NULL, logString);
+        std::cout << "ERROR: Wall fragment shader compilation failed -- " << logString << std::endl;
+    }
+    glGetShaderiv(exitFragmentShader, GL_COMPILE_STATUS, &status);
+    if (!status) {
+        glGetShaderInfoLog(exitFragmentShader, 512, NULL, logString);
+        std::cout << "ERROR: Exit fragment shader compilation failed -- " << logString << std::endl;
+    }
+
+    // Link compiled shaders
+    wallShader = glCreateProgram();
+    glAttachShader(wallShader, vertexShader);
+    glAttachShader(wallShader, wallFragmentShader);
+    glLinkProgram(wallShader); 
+    exitShader = glCreateProgram();
+    glAttachShader(exitShader, vertexShader);
+    glAttachShader(exitShader, exitFragmentShader);
+    glLinkProgram(exitShader);
+
+    // Report shader linking errors (if any)
+    glGetProgramiv(wallShader, GL_LINK_STATUS, &status);
+    if(!status) {
+        glGetProgramInfoLog(wallShader, 512, NULL, logString);
+        std::cout << "ERROR: Wall shader linking failed -- " << logString << std::endl;
+    }
+    glGetProgramiv(exitShader, GL_LINK_STATUS, &status);
+    if(!status) {
+        glGetProgramInfoLog(exitShader, 512, NULL, logString);
+        std::cout << "ERROR: Exit shader linking failed -- " << logString << std::endl;
+    }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(wallFragmentShader);
+    glDeleteShader(exitFragmentShader);
 }
 
 /*********************************************************************************
@@ -165,6 +261,56 @@ void initRenderData() {
  * @param grid the generated maze currently in play
  * @param pos two element array of current row and column coordinates, respectively
  *********************************************************************************/
-void renderPosition(std::vector<std::vector<int>> grid, int &pos, GLFWwindow* window) {
+void renderPosition(std::vector<std::vector<int>> grid, int *pos, GLFWwindow* window) {
+    // Clear screen to black
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(wallShader);
+    glBindVertexArray(wallVAO);
+    
+    // Draw all corners
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cornerEBO);
+    glDrawElements(GL_TRIANGLES, 3*8, GL_UNSIGNED_INT, 0);
+
+    // Draw surrounding walls
+    if (grid[pos[0]-1][pos[1]] == 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, topWallEBO);
+        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, 0);
+    }
+    if (grid[pos[0]][pos[1]+1] == 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rightWallEBO);
+        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, 0);
+    }
+    if (grid[pos[0]+1][pos[1]] == 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bottomWallEBO);
+        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, 0);
+    }
+    if (grid[pos[0]][pos[1]-1] == 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, leftWallEBO);
+        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, 0);
+    }
+
+    glUseProgram(exitShader);
+    glBindVertexArray(exitVAO);
+
+    // Draw surrounding exits
+
+    if (grid[pos[0]-1][pos[1]] < 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, topExitEBO);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    }
+    if (grid[pos[0]][pos[1]+1] < 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rightExitEBO);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    }
+    if (grid[pos[0]+1][pos[1]] < 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bottomExitEBO);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    }
+    if (grid[pos[0]][pos[1]-1] < 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, leftExitEBO);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    }
+
     glfwSwapBuffers(window);
 }

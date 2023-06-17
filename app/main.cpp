@@ -47,9 +47,9 @@ int main()
     bool exitReached = false;
 
     // Main loop begins
-    while (!glfwWindowShouldClose(window) || exitReached)
+    while (!glfwWindowShouldClose(window) && !exitReached)
     { 
-        renderPosition(playerGrid, *pos, window);
+        renderPosition(playerGrid, pos, window);
 
         // Record key pressed upon player input
         glfwWaitEvents();
@@ -81,9 +81,8 @@ int main()
         }
 
         // Exit loop if player has escaped
-        if (playerGrid[pos[0]][pos[1]] == 2) { 
+        if (playerGrid[pos[0]][pos[1]] == 2)
             exitReached = true;
-        }
 
         lastInputStatus = inputStatus;
     }
