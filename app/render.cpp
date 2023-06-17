@@ -8,12 +8,18 @@
 
 
 unsigned int wallVBO;
+unsigned int exitVAO;
+unsigned int exitVBO;
 
 unsigned int cornerEBO;
 unsigned int leftWallEBO;
 unsigned int rightWallEBO;
 unsigned int bottomWallEBO;
 unsigned int topWallEBO;
+unsigned int topExitEBO;
+unsigned int rightExitEBO;
+unsigned int bottomExitEBO;
+unsigned int leftExitEBO;
 
 /*********************************************************************************
  * @brief Define and store all vertex data necessary for future rendering
@@ -98,6 +104,58 @@ void initRenderData() {
     glGenBuffers(1, &topWallEBO);
     glBindBuffer(GL_ARRAY_BUFFER, topWallEBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(topWallIndices), topWallIndices, GL_ELEMENT_ARRAY_BUFFER);
+
+    // Configure how wall vertex data is read from buffers
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+
+    // ???
+    glGenVertexArrays(1, &exitVAO);
+    glBindVertexArray(exitVAO);
+
+    // Initialize vertex data for drawing exits
+    float exitVertices[] = {
+        -0.9,  1.0, 0.0,
+         0.9,  1.0, 0.0,
+         0.0,  0.4, 0.0,
+
+         1.0,  0.9, 0.0,
+         1.0, -0.9, 0.0,
+         0.4,  0.0, 0.0,
+
+        -0.9, -1.0, 0.0,
+         0.9, -1.0, 0.0,
+         0.0, -0.4, 0.0,
+        
+        -1.0,  0.9, 0.0,
+        -1.0, -0.9, 0.0,
+        -0.4,  0.0, 0.0
+    };
+
+    // Populate VBO with exit vertex data
+    glGenBuffers(1, &exitVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, exitVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(exitVertices), exitVertices, GL_STATIC_DRAW);
+
+    // Define indices of triangles that will denote exits and bind them to EBOs
+    glGenBuffers(1, &topExitEBO);
+    glBindBuffer(GL_ARRAY_BUFFER, topExitEBO);
+    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), (int []){0, 1, 2}, GL_ELEMENT_ARRAY_BUFFER);
+ 
+    glGenBuffers(1, &rightExitEBO);
+    glBindBuffer(GL_ARRAY_BUFFER, rightExitEBO);
+    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), (int []){3, 4, 5}, GL_ELEMENT_ARRAY_BUFFER);
+
+    glGenBuffers(1, &bottomExitEBO);
+    glBindBuffer(GL_ARRAY_BUFFER, bottomExitEBO);
+    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), (int []){6, 7, 8}, GL_ELEMENT_ARRAY_BUFFER);
+    
+    glGenBuffers(1, &leftExitEBO);
+    glBindBuffer(GL_ARRAY_BUFFER, leftExitEBO);
+    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), (int []){9, 10, 11}, GL_ELEMENT_ARRAY_BUFFER);
+
+    // Specify how exit vertex data is read from buffers
+
 }
 
 /*********************************************************************************
