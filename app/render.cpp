@@ -74,9 +74,10 @@ void initRenderData() {
         12, 13, 14,  // bottom right corner
         14, 15, 13
     };
+
     glGenBuffers(1, &cornerEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, cornerEBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cornerIndices), cornerIndices, GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cornerEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cornerIndices), cornerIndices, GL_STATIC_DRAW);
 
     // Define indices of two triangles that will draw each wall and bind them to EBOs
     uint32_t leftWallIndices[] = {
@@ -97,20 +98,20 @@ void initRenderData() {
     };
 
     glGenBuffers(1, &leftWallEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, leftWallEBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(leftWallIndices), leftWallIndices, GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, leftWallEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(leftWallIndices), leftWallIndices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &rightWallEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, rightWallEBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(rightWallIndices), rightWallIndices, GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rightWallEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rightWallIndices), rightWallIndices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &bottomWallEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, bottomWallEBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(bottomWallIndices), bottomWallIndices, GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bottomWallEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(bottomWallIndices), bottomWallIndices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &topWallEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, topWallEBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(topWallIndices), topWallIndices, GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, topWallEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(topWallIndices), topWallIndices, GL_STATIC_DRAW);
 
     // Configure how wall vertex data is read from buffers
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -150,20 +151,20 @@ void initRenderData() {
     uint32_t leftExitIndices[] = {9, 10, 11};
 
     glGenBuffers(1, &topExitEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, topExitEBO);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), topExitIndices, GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, topExitEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*sizeof(float), topExitIndices, GL_STATIC_DRAW);
  
     glGenBuffers(1, &rightExitEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, rightExitEBO);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), rightExitIndices, GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rightExitEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*sizeof(float), rightExitIndices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &bottomExitEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, bottomExitEBO);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), bottomExitIndices, GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bottomExitEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*sizeof(float), bottomExitIndices, GL_STATIC_DRAW);
     
     glGenBuffers(1, &leftExitEBO);
-    glBindBuffer(GL_ARRAY_BUFFER, leftExitEBO);
-    glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float), leftExitIndices, GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, leftExitEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*sizeof(float), leftExitIndices, GL_STATIC_DRAW);
 
     // Specify how exit vertex data is read from buffers
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
@@ -190,7 +191,7 @@ void initRenderData() {
         "void main()\n"
         "{\n"
         "   FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
-        "}\n";
+        "}\0";
 
     unsigned int wallFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(wallFragmentShader, 1, &wallFragmentShaderSource, NULL);
@@ -201,7 +202,7 @@ void initRenderData() {
         "void main()\n"
         "{\n"
         "   FragColor = vec4(1.0f, 1.0f, 0.75f, 1.0f);\n"
-        "}\n";
+        "}\0";
     
     unsigned int exitFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(exitFragmentShader, 1, &exitFragmentShaderSource, NULL);
@@ -261,7 +262,7 @@ void initRenderData() {
  * @param grid the generated maze currently in play
  * @param pos two element array of current row and column coordinates, respectively
  *********************************************************************************/
-void renderPosition(std::vector<std::vector<int>> grid, int *pos, GLFWwindow* window) {
+void renderPosition(std::vector<std::vector<int>> grid, int *pos, GLFWwindow *window) {
     // Clear screen to black
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -287,27 +288,26 @@ void renderPosition(std::vector<std::vector<int>> grid, int *pos, GLFWwindow* wi
     }
     if (grid[pos[0]][pos[1]-1] == 0) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, leftWallEBO);
-        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 3*2, GL_UNSIGNED_INT, 0); 
     }
 
     glUseProgram(exitShader);
     glBindVertexArray(exitVAO);
 
     // Draw surrounding exits
-
-    if (grid[pos[0]-1][pos[1]] < 0) {
+    if (grid[pos[0]-1][pos[1]] == -1 || grid[pos[0]-1][pos[1]] == 2) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, topExitEBO);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     }
-    if (grid[pos[0]][pos[1]+1] < 0) {
+    if (grid[pos[0]][pos[1]+1] == -1 || grid[pos[0]][pos[1]+1] == 2) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rightExitEBO);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     }
-    if (grid[pos[0]+1][pos[1]] < 0) {
+    if (grid[pos[0]+1][pos[1]] == -1 || grid[pos[0]+1][pos[1]] == 2) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bottomExitEBO);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     }
-    if (grid[pos[0]][pos[1]-1] < 0) {
+    if (grid[pos[0]][pos[1]-1] == -1 || grid[pos[0]][pos[1]-1] == 2) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, leftExitEBO);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     }

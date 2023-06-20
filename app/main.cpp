@@ -19,7 +19,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 800, "Blind Maze", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(800, 800, "Blind Maze", NULL, NULL);
     if (!window)
     {
         std::cout << "ERROR: Failed to create GLFW window" << std::endl;
@@ -41,7 +41,8 @@ int main()
     // Prepare to render initial player position 
     std::vector<std::vector<int>> playerGrid = createMaze(3);
     int pos[2];
-    findPlayerPos(playerGrid, *pos);
+    findPlayerPos(playerGrid, pos);
+
 
     int lastInputStatus = 0;
     bool exitReached = false;
