@@ -19,4 +19,4 @@ extern std::vector<std::vector<int>> createMaze(const int size);
  * @param grid the generated maze currently in play
  * @param pos array to be populated with row and column coordinates
  *********************************************************************************/
-void findPlayerPos(std::vector<std::vector<int>> grid, int &pos);
+void findPlayerPos(std::vector<std::vector<int>> grid, int *pos);

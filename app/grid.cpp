@@ -16,7 +16,7 @@
 std::vector<std::vector<int>> createMaze(const int size) 
 {
     // Initialize array assuming movement is allowed in any direction (in order: left, right, up, down)
-    bool moveOptions[4] = {true, true, true, true};
+    std::vector<bool> moveOptions = {true, true, true, true};
     unsigned int cellsVisited = 0;
 
     // Initialize random generator objects and grid
@@ -36,23 +36,15 @@ std::vector<std::vector<int>> createMaze(const int size)
 
     // Restrict initial movement options as necessary
     if (row == 1)                   
-    {
         moveOptions[2] = false;
-    } 
     else if (row == (size*2)-1)
-    {
         moveOptions[3] = false;
-    } 
     if (col == 1)       
-    {
         moveOptions[0] = false;
-    } 
     else if (col == (size*2)-1)
-    {
         moveOptions[1] = false;
-    } 
 
-    // Main loop; runs until all cells have been visited
+    // Main loop (runs until all cells have been visited)
     while (cellsVisited != size*size)
     {
         // Randomly choose valid movement direction
@@ -78,7 +70,17 @@ std::vector<std::vector<int>> createMaze(const int size)
         }
 
         ++cellsVisited;
-    }
+    } 
+
+    // Rendering test grid return
+    /*
+    std::vector<std::vector<int>> grid = { {0,  0, 0, 2, 0},
+                                           {0,  0, 1, 1, 0},
+                                           {0,  0, 1, 0, 0},
+                                           {0,  1, 1, 0, 0},
+                                           {0, -1, 0, 0, 0}
+    };
+    */
 
     return grid;
 }
@@ -89,6 +91,9 @@ std::vector<std::vector<int>> createMaze(const int size)
  * @param grid the generated maze currently in play
  * @param pos array to be populated with row and column coordinates
  *********************************************************************************/
-void findPlayerPos(std::vector<std::vector<int>> grid, int &pos) {
-    
+void findPlayerPos(std::vector<std::vector<int>> grid, int *pos) {
+    // Rendering test grid starting pos
+
+    //pos[0] = 3;
+    //pos[1] = 1;
 }
