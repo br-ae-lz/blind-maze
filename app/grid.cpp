@@ -2,6 +2,7 @@
     Defines functions for maze generation and analysis
 */
 
+#include <algorithm>
 #include <random>
 #include <vector>
 #include <iostream>
@@ -11,89 +12,166 @@
  *        algorithm.
  *
  * @param size dictates size of the generated maze (min 2, max 99)
+ * @param pos array to be populated with starting row and column coordinates
  * @returns size*size uniform spanning tree maze
  *********************************************************************************/
-std::vector<std::vector<int>> createMaze(const int size) 
-{
+std::vector<std::vector<int>> createMaze(const int size, int *pos) {
     // Initialize array assuming movement is allowed in any direction (in order: left, right, up, down)
-    std::vector<bool> moveOptions = {true, true, true, true};
-    unsigned int cellsVisited = 0;
+    char moveOptions[] = {'l', 'r', 'u', 'd'};
+    bool moveValid[] = {true, true, true, true};
+    unsigned int cellsVisited = 1;
 
     // Initialize random generator objects and grid
     std::random_device rd;
     std::mt19937 randEngine(rd());
-    std::uniform_int_distribution<int> directionDist(1, 4);
-    std::uniform_int_distribution<int> gridDist(1, size*2 - 1); 
+    std::uniform_int_distribution<int> gridDist(0, size-1);
+    std::uniform_int_distribution<int> coinFlipDist(0, 1);
     std::vector<std::vector<int>> grid((size*2 + 1), std::vector<int> ((size*2 + 1), 0));
 
-    // Pick random grid cell
+    // Pick random starting grid cell
     int row = 0, col = 0;
-    while ( (row % 2 != 1) || (col % 2 != 1) ) 
-    {
-        row = gridDist(randEngine);
-        col = gridDist(randEngine);
-    }
+    row = gridDist(randEngine)*2 + 1;
+    col = gridDist(randEngine)*2 + 1;
+    grid[row][col] = 2;
 
     // Restrict initial movement options as necessary
-    if (row == 1)                   
-        moveOptions[2] = false;
-    else if (row == (size*2)-1)
-        moveOptions[3] = false;
-    if (col == 1)       
-        moveOptions[0] = false;
-    else if (col == (size*2)-1)
-        moveOptions[1] = false;
+    if (row == 1)                   // Up
+        moveValid[2] = false;
+    else if (row == (size*2)-1)     // Down
+        moveValid[3] = false;
+    if (col == 1)                   // Left
+        moveValid[0] = false;
+    else if (col == (size*2)-1)     // Right
+        moveValid[1] = false;
 
     // Main loop (runs until all cells have been visited)
     while (cellsVisited != size*size)
     {
-        // Randomly choose valid movement direction
-        int currentMove = directionDist(randEngine);
+        // Choose random movement direction
+        std::shuffle(std::begin(moveOptions), std::end(moveOptions), randEngine);
+        char *currentMove = &moveOptions[0];
 
-        // carve a parth to, mark, and count target cell
-        // if previously unvisited, then reevaluate movement options from said cell
-        if (currentMove == 0)   // left movement routine
-        {
-            col -= 2;
-            if (grid[row][col] != 2)
-            {
-                grid[row][col] = 2;
-                grid[row][col+1] = 1;
-                cellsVisited += 1;
-            }
+        // Validate movement direction (find another if invalid) and perform algorithm routine
+        // (Routine consists of following the chosen movement to carve a path to, mark, and count the
+        // destination cell if previously unvisited. Afterward, valid movements are reevaluated.)
+        bool moveIsValid = false;
+        while (!moveIsValid) {
+            switch (*currentMove) {
+                case 'l':
+                    if (moveValid[0]) {
+                        moveIsValid = true;
+                        col -= 2;
 
-            if (moveOptions[1])
-            {
-                
+                        if (grid[row][col] != 2) {
+                            grid[row][col] = 2;
+                            grid[row][col+1] = 1;
+                            cellsVisited++;
+                        }
+
+                        if (!moveValid[1]) 
+                            moveValid[1] = true;
+                        if (col == 1) 
+                            moveValid[0] = false;
+                        continue;
+                    }
+                    break;
+
+                case 'r':
+                    if (moveValid[1]) {
+                        moveIsValid = true;
+                        col += 2;
+
+                        if (grid[row][col] != 2) {
+                            grid[row][col] = 2;
+                            grid[row][col-1] = 1;
+                            cellsVisited++;
+                        }
+
+                        if (!moveValid[0]) 
+                            moveValid[0] = true;
+                        if (col == size*2 - 1) 
+                            moveValid[1] = false;                            
+                        continue;                            
+                    }
+                    break;
+
+                case 'u':
+                    if (moveValid[2]) {
+                        moveIsValid = true;
+                        row -= 2;
+
+                        if (grid[row][col] != 2) {
+                            grid[row][col] = 2;
+                            grid[row+1][col] = 1;
+                            cellsVisited++;
+                        }
+
+                        if (!moveValid[3]) 
+                            moveValid[3] = true;
+                        if (row == 1) 
+                            moveValid[2] = false;                            
+                        continue;                            
+                    }
+                    break;
+
+                case 'd':
+                    if (moveValid[3]) {
+                        moveIsValid = true;
+                        row += 2;
+
+                        if (grid[row][col] != 2) {
+                            grid[row][col] = 2;
+                            grid[row-1][col] = 1;
+                            cellsVisited++;
+                        }
+
+                        if (!moveValid[2]) 
+                            moveValid[2] = true;
+                        if (row == size*2 - 1) 
+                            moveValid[3] = false;                            
+                        continue;                            
+                    }
             }
-            
+            currentMove++;
         }
-
-        ++cellsVisited;
     } 
 
-    // Rendering test grid return
-    /*
-    std::vector<std::vector<int>> grid = { {0,  0, 0, 2, 0},
-                                           {0,  0, 1, 1, 0},
-                                           {0,  0, 1, 0, 0},
-                                           {0,  1, 1, 0, 0},
-                                           {0, -1, 0, 0, 0}
-    };
-    */
+    // Create entry (marked by -1)
+    if (coinFlipDist(randEngine)) {         
+        row = coinFlipDist(randEngine) ? 0 : size*2;
+        col = gridDist(randEngine)*2 + 1;
+    } else {
+        col = coinFlipDist(randEngine) ? 0 : size*2;
+        row = gridDist(randEngine)*2 + 1;
+    }
+    grid[row][col] = -1;
+
+    // Save starting row and column coordinates
+    if (row == 0) {
+        row++;
+    } else if (row == size*2) {
+        row--;
+    } else if (col == 0) {
+        col++;
+    } else if (col == size*2) {
+        col--;
+    }
+    pos[0] = row;
+    pos[1] = col;
+
+    // Create exit (marked by 3) while ensuring no overlap with entry
+    bool overlapsEntry = false;
+    do {
+        if (coinFlipDist(randEngine)) {         
+            row = coinFlipDist(randEngine) ? 0 : size*2;
+            col = gridDist(randEngine)*2 + 1;
+        } else {
+            col = coinFlipDist(randEngine) ? 0 : size*2;
+            row = gridDist(randEngine)*2 + 1;
+        }
+        overlapsEntry = (grid[row][col] == -1);
+    } while (overlapsEntry);
+    grid[row][col] = 3;
 
     return grid;
-}
-
-/*********************************************************************************
- * @brief Locates the player's position in the given maze and stores their
- *        coordinates in a variable passed by the caller.
- * @param grid the generated maze currently in play
- * @param pos array to be populated with row and column coordinates
- *********************************************************************************/
-void findPlayerPos(std::vector<std::vector<int>> grid, int *pos) {
-    // Rendering test grid starting pos
-
-    //pos[0] = 3;
-    //pos[1] = 1;
 }

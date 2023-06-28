@@ -11,12 +11,4 @@
  *  @param size dictates size of the generated maze (min 2, max 99)
  *  @returns size*size uniform spanning tree maze
  *********************************************************************************/
-extern std::vector<std::vector<int>> createMaze(const int size);
-
-/*********************************************************************************
- * @brief Locates the player's position in the given maze and stores their
- *        coordinates in a variable passed by the caller.
- * @param grid the generated maze currently in play
- * @param pos array to be populated with row and column coordinates
- *********************************************************************************/
-void findPlayerPos(std::vector<std::vector<int>> grid, int *pos);
+extern std::vector<std::vector<int>> createMaze(const int size, int *pos);

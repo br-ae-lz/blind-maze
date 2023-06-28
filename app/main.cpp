@@ -11,8 +11,7 @@
 #include <render.h>
 
 
-int main() 
-{
+int main() {
     // Check user's OpenGL version (and create window only if sufficient)
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -20,16 +19,14 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     GLFWwindow *window = glfwCreateWindow(800, 800, "Blind Maze", NULL, NULL);
-    if (!window)
-    {
+    if (!window) {
         std::cout << "ERROR: Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
     glfwMakeContextCurrent(window);
 
-    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
-    {
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "ERROR: Failed to initialize GLAD" << std::endl;
         return -1;
     }   
@@ -39,17 +36,15 @@ int main()
     initRenderData();
 
     // Prepare to render initial player position 
-    std::vector<std::vector<int>> playerGrid = createMaze(3);
     int pos[2];
-    findPlayerPos(playerGrid, pos);
+    std::vector<std::vector<int>> playerGrid = createMaze(10, pos);
 
 
     int lastInputStatus = 0;
     bool exitReached = false;
 
     // Main loop begins
-    while (!glfwWindowShouldClose(window) && !exitReached)
-    { 
+    while (!glfwWindowShouldClose(window) && !exitReached) { 
         renderPosition(playerGrid, pos, window);
 
         // Record key pressed upon player input
@@ -82,8 +77,9 @@ int main()
         }
 
         // Exit loop if player has escaped
-        if (playerGrid[pos[0]][pos[1]] == 2)
+        if (playerGrid[pos[0]][pos[1]] == 3) {
             exitReached = true;
+        }
 
         lastInputStatus = inputStatus;
     }

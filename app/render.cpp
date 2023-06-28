@@ -295,19 +295,19 @@ void renderPosition(std::vector<std::vector<int>> grid, int *pos, GLFWwindow *wi
     glBindVertexArray(exitVAO);
 
     // Draw surrounding exits
-    if (grid[pos[0]-1][pos[1]] == -1 || grid[pos[0]-1][pos[1]] == 2) {
+    if (grid[pos[0]-1][pos[1]] == -1 || grid[pos[0]-1][pos[1]] == 3) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, topExitEBO);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     }
-    if (grid[pos[0]][pos[1]+1] == -1 || grid[pos[0]][pos[1]+1] == 2) {
+    if (grid[pos[0]][pos[1]+1] == -1 || grid[pos[0]][pos[1]+1] == 3) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rightExitEBO);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     }
-    if (grid[pos[0]+1][pos[1]] == -1 || grid[pos[0]+1][pos[1]] == 2) {
+    if (grid[pos[0]+1][pos[1]] == -1 || grid[pos[0]+1][pos[1]] == 3) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bottomExitEBO);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     }
-    if (grid[pos[0]][pos[1]-1] == -1 || grid[pos[0]][pos[1]-1] == 2) {
+    if (grid[pos[0]][pos[1]-1] == -1 || grid[pos[0]][pos[1]-1] == 3) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, leftExitEBO);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
     }
